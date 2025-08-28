@@ -2,6 +2,9 @@
 从2025/7/26开始  
 这里也包含一些过去编写小项目，可通过[仓库](https://github.com/xkgt/PythonLearn)查看
 
+## 2025/8/28
+- [第23期 - Python连接数据库](docs/Python连接数据库.md)
+
 ## 2025/8/27
 - [第22期 - SQL查询语法](docs/SQL查询语法.md)
 
