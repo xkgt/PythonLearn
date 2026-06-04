@@ -2,6 +2,9 @@
 从2025/7/26开始  
 这里也包含一些过去编写小项目，可通过[仓库](https://github.com/xkgt/PythonLearn)查看
 
+## 2026/6/4
+- [第25期 - 用代码理解MCP和function call.md](docs/用代码理解MCP和FunctionCall.md)
+
 ## 2025/9/20
 - [第24期 - 利用AI编写一个水滴融合效果.md](docs/利用AI编写一个水滴融合效果.md)
 
