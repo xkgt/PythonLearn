@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章列表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #0d1b2a, #1b263b, #415a77);
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #e0e1dd;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title {
+            color: #ffd700;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .card-date {
+            color: #a8dadc;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .card-link {
+            color: #f1faee;
+            text-decoration: none;
+            font-size: 0.95em;
+            line-height: 1.6;
+            display: block;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 马卡龙色系卡片边框 */
+        .card:nth-child(6n+1) { border-left: 4px solid #ffb7b2; }
+        .card:nth-child(6n+2) { border-left: 4px solid #b5ead7; }
+        .card:nth-child(6n+3) { border-left: 4px solid #c7ceea; }
+        .card:nth-child(6n+4) { border-left: 4px solid #ffdac1; }
+        .card:nth-child(6n+5) { border-left: 4px solid #e2f0cb; }
+        .card:nth-child(6n+6) { border-left: 4px solid #ffffb5; }
+
+        .loading {
+            text-align: center;
+            color: #e0e1dd;
+            font-size: 1.5em;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <h1>📚 文章列表</h1>
+    
+    <div class="container" id="container">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 解析 README.md 内容
+        function parseReadme(content) {
+            const articles = [];
+            // 正则匹配：## 日期 + - [标题](链接)
+            const dateRegex = /##\s+(\d{4}\/\d{1,2}\/\d{1,2})/g;
+            const articleRegex = /-\s+\[([^\]]+)\]\(([^)]+)\)/g;
+            
+            let currentDate = '';
+            const lines = content.split('\n');
+            
+            for (const line of lines) {
+                const dateMatch = line.match(/^##\s+(\d{4}\/\d{1,2}\/\d{1,2})/);
+                if (dateMatch) {
+                    currentDate = dateMatch[1];
+                }
+                
+                const articleMatch = line.match(/^-\s+\[([^\]]+)\]\(([^)]+)\)/);
+                if (articleMatch && currentDate) {
+                    articles.push({
+                        title: articleMatch[1],
+                        link: articleMatch[2],
+                        date: currentDate
+                    });
+                }
+            }
+            
+            return articles;
+        }
+
+        // 创建卡片
+        function createCard(article, index) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = (index * 0.1) + 's';
+            
+            card.innerHTML = `
+                <div class="card-title">${article.title}</div>
+                <div class="card-date">📅 ${article.date}</div>
+                <a href="${article.link}" class="card-link" target="_blank">点击阅读 →</a>
+            `;
+            
+            return card;
+        }
+
+        // 加载并显示文章
+        async function loadArticles() {
+            try {
+                const response = await fetch('README.md');
+                const content = await response.text();
+                const articles = parseReadme(content);
+                
+                const container = document.getElementById('container');
+                container.innerHTML = '';
+                
+                articles.forEach((article, index) => {
+                    const card = createCard(article, index);
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('加载文章失败:', error);
+                document.getElementById('container').innerHTML = 
+                    '<div class="loading">加载失败，请确保通过 HTTP 服务器访问此页面</div>';
+            }
+        }
+
+        // 初始化
+        createStars();
+        loadArticles();
+    </script>
+</body>
+</html>
